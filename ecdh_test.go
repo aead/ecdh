@@ -13,7 +13,7 @@ import (
 )
 
 // An example for the ECDH key-exchange using the curve P256.
-func ExampleGenericKeyExchange() {
+func ExampleGenericCurve() {
 	p256 := GenericCurve(elliptic.P256())
 
 	privateAlice, publicAlice, err := p256.GenerateKey(rand.Reader)
@@ -38,14 +38,11 @@ func ExampleGenericKeyExchange() {
 	if !bytes.Equal(secretAlice, secretBob) {
 		fmt.Printf("key exchange failed - secret X coordinates not equal\n")
 	}
-
-	fmt.Println("\nkey exchange succeed\n")
 	// Output:
-	// key exchange succeed
 }
 
 // An example for the ECDH key-exchange using Curve25519.
-func ExampleCurve25519KeyExchange() {
+func ExampleCurve25519() {
 	c25519 := Curve25519()
 
 	privateAlice, publicAlice, err := c25519.GenerateKey(rand.Reader)
@@ -70,11 +67,10 @@ func ExampleCurve25519KeyExchange() {
 	if !bytes.Equal(secretAlice, secretBob) {
 		fmt.Printf("key exchange failed - secret X coordinates not equal\n")
 	}
-
-	fmt.Println("\nkey exchange succeed\n")
 	// Output:
-	// key exchange succeed
 }
+
+// Benchmarks
 
 func BenchmarkCurve25519(b *testing.B) {
 	curve := Curve25519()
