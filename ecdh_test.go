@@ -13,8 +13,8 @@ import (
 )
 
 // An example for the ECDH key-exchange using the curve P256.
-func ExampleGenericCurve() {
-	p256 := GenericCurve(elliptic.P256())
+func ExampleGeneric() {
+	p256 := Generic(elliptic.P256())
 
 	privateAlice, publicAlice, err := p256.GenerateKey(rand.Reader)
 	if err != nil {
@@ -42,8 +42,8 @@ func ExampleGenericCurve() {
 }
 
 // An example for the ECDH key-exchange using Curve25519.
-func ExampleCurve25519() {
-	c25519 := Curve25519()
+func ExampleX25519() {
+	c25519 := X25519()
 
 	privateAlice, publicAlice, err := c25519.GenerateKey(rand.Reader)
 	if err != nil {
@@ -72,8 +72,8 @@ func ExampleCurve25519() {
 
 // Benchmarks
 
-func BenchmarkCurve25519(b *testing.B) {
-	curve := Curve25519()
+func BenchmarkX25519(b *testing.B) {
+	curve := X25519()
 	privateAlice, _, err := curve.GenerateKey(rand.Reader)
 	if err != nil {
 		b.Fatalf("Failed to generate Alice's private/public key pair: %s", err)
@@ -87,8 +87,8 @@ func BenchmarkCurve25519(b *testing.B) {
 	}
 }
 
-func BenchmarkKeyGenerateCurve25519(b *testing.B) {
-	curve := Curve25519()
+func BenchmarkKeyGenerateX25519(b *testing.B) {
+	curve := X25519()
 	for i := 0; i < b.N; i++ {
 		_, _, err := curve.GenerateKey(rand.Reader)
 		if err != nil {
@@ -98,7 +98,7 @@ func BenchmarkKeyGenerateCurve25519(b *testing.B) {
 }
 
 func BenchmarkP256(b *testing.B) {
-	p256 := GenericCurve(elliptic.P256())
+	p256 := Generic(elliptic.P256())
 	privateAlice, _, err := p256.GenerateKey(rand.Reader)
 	if err != nil {
 		b.Fatalf("Failed to generate Alice's private/public key pair: %s", err)
@@ -114,7 +114,7 @@ func BenchmarkP256(b *testing.B) {
 }
 
 func BenchmarkKeyGenerateP256(b *testing.B) {
-	p256 := GenericCurve(elliptic.P256())
+	p256 := Generic(elliptic.P256())
 	for i := 0; i < b.N; i++ {
 		_, _, err := p256.GenerateKey(rand.Reader)
 		if err != nil {
@@ -124,7 +124,7 @@ func BenchmarkKeyGenerateP256(b *testing.B) {
 }
 
 func BenchmarkP521(b *testing.B) {
-	p521 := GenericCurve(elliptic.P256())
+	p521 := Generic(elliptic.P256())
 	privateAlice, _, err := p521.GenerateKey(rand.Reader)
 	if err != nil {
 		b.Fatalf("Failed to generate Alice's private/public key pair: %s", err)
@@ -140,7 +140,7 @@ func BenchmarkP521(b *testing.B) {
 }
 
 func BenchmarkKeyGenerateP521(b *testing.B) {
-	p521 := GenericCurve(elliptic.P256())
+	p521 := Generic(elliptic.P256())
 	for i := 0; i < b.N; i++ {
 		_, _, err := p521.GenerateKey(rand.Reader)
 		if err != nil {

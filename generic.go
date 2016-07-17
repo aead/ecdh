@@ -29,7 +29,7 @@ func unmarshal(curve elliptic.Curve, data []byte) (x, y *big.Int) {
 
 // GenericCurve creates a new ecdh.KeyExchange with
 // generic elliptic.Curve implementations.
-func GenericCurve(c elliptic.Curve) KeyExchange {
+func Generic(c elliptic.Curve) KeyExchange {
 	if c == nil {
 		panic("ecdh: curve is nil")
 	}

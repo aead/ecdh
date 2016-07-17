@@ -16,7 +16,7 @@ type ecdh25519 struct{}
 
 // Curve25519 creates a new ecdh.KeyExchange with
 // the elliptic curve Curve25519.
-func Curve25519() KeyExchange {
+func X25519() KeyExchange {
 	return ecdh25519{}
 }
 
