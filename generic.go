@@ -5,6 +5,7 @@
 package ecdh
 
 import (
+	"crypto"
 	"crypto/elliptic"
 	"crypto/rand"
 	"errors"
@@ -12,22 +13,13 @@ import (
 	"math/big"
 )
 
-// The same unmarshal as elliptic.Unmarshal but without
-// point checking (see Check method)
-func unmarshal(curve elliptic.Curve, data []byte) (x, y *big.Int) {
-	byteLen := (curve.Params().BitSize + 7) >> 3
-	if len(data) != 1+2*byteLen {
-		return
-	}
-	if data[0] != 4 { // uncompressed form
-		return
-	}
-	x = new(big.Int).SetBytes(data[1 : 1+byteLen])
-	y = new(big.Int).SetBytes(data[1+byteLen:])
-	return
+// Point represents a generic elliptic curve Point with a
+// X and a Y coordinate.
+type Point struct {
+	X, Y *big.Int
 }
 
-// GenericCurve creates a new ecdh.KeyExchange with
+// Generic creates a new ecdh.KeyExchange with
 // generic elliptic.Curve implementations.
 func Generic(c elliptic.Curve) KeyExchange {
 	if c == nil {
@@ -40,7 +32,7 @@ type genericCurve struct {
 	curve elliptic.Curve
 }
 
-func (g genericCurve) GenerateKey(random io.Reader) (private PrivateKey, public PublicKey, err error) {
+func (g genericCurve) GenerateKey(random io.Reader) (private crypto.PrivateKey, public crypto.PublicKey, err error) {
 	if random == nil {
 		random = rand.Reader
 	}
@@ -49,35 +41,73 @@ func (g genericCurve) GenerateKey(random io.Reader) (private PrivateKey, public 
 		private = nil
 		return
 	}
-	public = elliptic.Marshal(g.curve, x, y)
+	public = Point{X: x, Y: y}
 	return
 }
 
-func (g genericCurve) PublicKey(private PrivateKey) (public PublicKey) {
-	N := g.curve.Params().N
+func (g genericCurve) PublicKey(private crypto.PrivateKey) (public crypto.PublicKey) {
+	key, ok := checkPrivateKey(private)
+	if !ok {
+		panic("ecdh: unexpected type of private key")
+	}
 
-	if new(big.Int).SetBytes(private).Cmp(N) >= 0 {
+	N := g.curve.Params().N
+	if new(big.Int).SetBytes(key).Cmp(N) >= 0 {
 		panic("ecdh: private key cannot used with given curve")
 	}
 
-	x, y := g.curve.ScalarBaseMult(private)
-	public = elliptic.Marshal(g.curve, x, y)
+	x, y := g.curve.ScalarBaseMult(key)
+	public = Point{X: x, Y: y}
 	return
 }
 
-func (g genericCurve) Check(peersPublic PublicKey) (err error) {
-	x, y := unmarshal(g.curve, peersPublic)
-	if !g.curve.IsOnCurve(x, y) {
+func (g genericCurve) Check(peersPublic crypto.PublicKey) (err error) {
+	key, ok := checkPublicKey(peersPublic)
+	if !ok {
+		err = errors.New("unexpected type of peers public key")
+	}
+	if !g.curve.IsOnCurve(key.X, key.Y) {
 		err = errors.New("peer's public key is not on curve")
 	}
 	return
 }
 
-func (g genericCurve) ComputeSecret(private PrivateKey, peersPublic PublicKey) (secret []byte) {
-	x, y := unmarshal(g.curve, peersPublic)
+func (g genericCurve) ComputeSecret(private crypto.PrivateKey, peersPublic crypto.PublicKey) (secret []byte) {
+	priKey, ok := checkPrivateKey(private)
+	if !ok {
+		panic("ecdh: unexpected type of private key")
+	}
+	pubKey, ok := checkPublicKey(peersPublic)
+	if !ok {
+		panic("ecdh: unexpected type of peers public key")
+	}
 
-	sX, _ := g.curve.ScalarMult(x, y, private)
+	sX, _ := g.curve.ScalarMult(pubKey.X, pubKey.Y, priKey)
 
 	secret = sX.Bytes()
+	return
+}
+
+func checkPrivateKey(typeToCheck interface{}) (key []byte, ok bool) {
+	switch t := typeToCheck.(type) {
+	case []byte:
+		key = t
+		ok = true
+	case *[]byte:
+		key = *t
+		ok = true
+	}
+	return
+}
+
+func checkPublicKey(typeToCheck interface{}) (key Point, ok bool) {
+	switch t := typeToCheck.(type) {
+	case Point:
+		key = t
+		ok = true
+	case *Point:
+		key = *t
+		ok = true
+	}
 	return
 }

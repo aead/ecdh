@@ -82,6 +82,7 @@ func BenchmarkX25519(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Failed to generate Bob's private/public key pair: %s", err)
 	}
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		curve.ComputeSecret(privateAlice, publicBob)
 	}
@@ -89,6 +90,7 @@ func BenchmarkX25519(b *testing.B) {
 
 func BenchmarkKeyGenerateX25519(b *testing.B) {
 	curve := X25519()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _, err := curve.GenerateKey(rand.Reader)
 		if err != nil {
@@ -115,34 +117,9 @@ func BenchmarkP256(b *testing.B) {
 
 func BenchmarkKeyGenerateP256(b *testing.B) {
 	p256 := Generic(elliptic.P256())
-	for i := 0; i < b.N; i++ {
-		_, _, err := p256.GenerateKey(rand.Reader)
-		if err != nil {
-			b.Fatalf("Failed to generate Alice's private/public key pair: %s", err)
-		}
-	}
-}
-
-func BenchmarkP521(b *testing.B) {
-	p521 := Generic(elliptic.P256())
-	privateAlice, _, err := p521.GenerateKey(rand.Reader)
-	if err != nil {
-		b.Fatalf("Failed to generate Alice's private/public key pair: %s", err)
-	}
-	_, publicBob, err := p521.GenerateKey(rand.Reader)
-	if err != nil {
-		b.Fatalf("Failed to generate Bob's private/public key pair: %s", err)
-	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		p521.ComputeSecret(privateAlice, publicBob)
-	}
-}
-
-func BenchmarkKeyGenerateP521(b *testing.B) {
-	p521 := Generic(elliptic.P256())
-	for i := 0; i < b.N; i++ {
-		_, _, err := p521.GenerateKey(rand.Reader)
+		_, _, err := p256.GenerateKey(rand.Reader)
 		if err != nil {
 			b.Fatalf("Failed to generate Alice's private/public key pair: %s", err)
 		}

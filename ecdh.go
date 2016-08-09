@@ -13,30 +13,27 @@
 // only uses the x-coordinate as the computed secret.
 package ecdh // import "github.com/aead/ecdh"
 
-import "io"
-
-// PublicKey is the type of ECDH public keys.
-type PublicKey []byte
-
-// PrivateKey is the type of ECDH private keys.
-type PrivateKey []byte
+import (
+	"crypto"
+	"io"
+)
 
 // KeyExchange is the interface defining all functions
 // necessary for ECDH.
 type KeyExchange interface {
 	// GenerateKey generates a private/public key pair using entropy from rand.
 	// If rand is nil, crypto/rand.Reader will be used.
-	GenerateKey(rand io.Reader) (private PrivateKey, public PublicKey, err error)
+	GenerateKey(rand io.Reader) (private crypto.PrivateKey, public crypto.PublicKey, err error)
 
 	// PublicKey returns the public key corresponding to the given private one.
-	PublicKey(private PrivateKey) (public PublicKey)
+	PublicKey(private crypto.PrivateKey) (public crypto.PublicKey)
 
 	// Check returns a non-nil error if the peers public key cannot used for the
 	// key exchange (e.g. the public key isn't a point of the elliptic curve)
 	// It's recommended to check peer's public key before computing the secret.
-	Check(peersPublic PublicKey) (err error)
+	Check(peersPublic crypto.PublicKey) (err error)
 
 	// ComputeSecret returns the secret value computed from the given private key
 	// and the peers public key.
-	ComputeSecret(private PrivateKey, peersPublic PublicKey) (secret []byte)
+	ComputeSecret(private crypto.PrivateKey, peersPublic crypto.PublicKey) (secret []byte)
 }
