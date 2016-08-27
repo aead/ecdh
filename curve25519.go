@@ -68,7 +68,7 @@ func (c ecdh25519) ComputeSecret(private crypto.PrivateKey, peersPublic crypto.P
 	if ok := checkType(&pri, private); !ok {
 		panic("ecdh: unexpected type of private key")
 	}
-	if ok := checkType(&pub, private); !ok {
+	if ok := checkType(&pub, peersPublic); !ok {
 		panic("ecdh: unexpected type of peers public key")
 	}
 
