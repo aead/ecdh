@@ -81,10 +81,10 @@ func (c ecdh25519) ComputeSecret(private crypto.PrivateKey, peersPublic crypto.P
 func checkType(key *[32]byte, typeToCheck interface{}) (ok bool) {
 	switch t := typeToCheck.(type) {
 	case [32]byte:
-		key = &t
+		*key = t
 		ok = true
 	case *[32]byte:
-		key = t
+		*key = *t
 		ok = true
 	case []byte:
 		if len(t) == 32 {
