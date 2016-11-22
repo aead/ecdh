@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"testing"
 )
 
@@ -68,6 +70,40 @@ func ExampleX25519() {
 		fmt.Printf("key exchange failed - secret X coordinates not equal\n")
 	}
 	// Output:
+}
+
+func TestX25519(t *testing.T) {
+	dh := X25519()
+
+	secret := make([]byte, 32)
+	var priBob [32]byte
+	for i := 0; i < 3; i++ {
+		priAlice, pubAlice, err := dh.GenerateKey(nil)
+		if err != nil {
+			t.Fatalf("alice: key pair generation failed: %s", err)
+		}
+
+		if _, err := io.ReadFull(rand.Reader, priBob[:]); err != nil {
+			t.Fatalf("carol: private key generation failed: %s", err)
+		}
+		pubBob := dh.PublicKey(&priBob)
+
+		secAlice := dh.ComputeSecret(priAlice, pubBob)
+		secBob := dh.ComputeSecret(&priBob, pubAlice)
+
+		if !bytes.Equal(secAlice, secBob) {
+			toStr := hex.EncodeToString
+			t.Fatalf("DH failed: secrets are not equal:\nAlice got: %s\nBob   got: %s", toStr(secAlice), toStr(secBob))
+		}
+		if secret != nil {
+			if bytes.Equal(secret, secAlice) {
+				t.Fatalf("DH generates the same secret all the time")
+			}
+		} else {
+			copy(secret, secAlice)
+		}
+	}
+
 }
 
 // Benchmarks
