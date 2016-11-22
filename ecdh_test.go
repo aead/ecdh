@@ -77,7 +77,7 @@ func TestX25519(t *testing.T) {
 
 	secret := make([]byte, 32)
 	var priBob [32]byte
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 2; i++ {
 		priAlice, pubAlice, err := dh.GenerateKey(nil)
 		if err != nil {
 			t.Fatalf("alice: key pair generation failed: %s", err)
@@ -95,13 +95,10 @@ func TestX25519(t *testing.T) {
 			toStr := hex.EncodeToString
 			t.Fatalf("DH failed: secrets are not equal:\nAlice got: %s\nBob   got: %s", toStr(secAlice), toStr(secBob))
 		}
-		if secret != nil {
-			if bytes.Equal(secret, secAlice) {
-				t.Fatalf("DH generates the same secret all the time")
-			}
-		} else {
-			copy(secret, secAlice)
+		if bytes.Equal(secret, secAlice) {
+			t.Fatalf("DH generates the same secret all the time")
 		}
+		copy(secret, secAlice)
 	}
 
 }
