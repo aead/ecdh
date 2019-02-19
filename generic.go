@@ -45,6 +45,14 @@ func (g genericCurve) GenerateKey(random io.Reader) (private crypto.PrivateKey, 
 	return
 }
 
+func (g genericCurve) Params() CurveParams {
+	p := g.curve.Params()
+	return CurveParams{
+		Name:    p.Name,
+		BitSize: p.BitSize,
+	}
+}
+
 func (g genericCurve) PublicKey(private crypto.PrivateKey) (public crypto.PublicKey) {
 	key, ok := checkPrivateKey(private)
 	if !ok {

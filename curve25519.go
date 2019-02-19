@@ -15,13 +15,18 @@ import (
 
 type ecdh25519 struct{}
 
+var curve25519Params = CurveParams{
+	Name:    "Curve25519",
+	BitSize: 255,
+}
+
 // X25519 creates a new ecdh.KeyExchange with
 // the elliptic curve Curve25519.
 func X25519() KeyExchange {
 	return ecdh25519{}
 }
 
-func (c ecdh25519) GenerateKey(random io.Reader) (private crypto.PrivateKey, public crypto.PublicKey, err error) {
+func (ecdh25519) GenerateKey(random io.Reader) (private crypto.PrivateKey, public crypto.PublicKey, err error) {
 	if random == nil {
 		random = rand.Reader
 	}
@@ -44,7 +49,9 @@ func (c ecdh25519) GenerateKey(random io.Reader) (private crypto.PrivateKey, pub
 	return
 }
 
-func (c ecdh25519) PublicKey(private crypto.PrivateKey) (public crypto.PublicKey) {
+func (ecdh25519) Params() CurveParams { return curve25519Params }
+
+func (ecdh25519) PublicKey(private crypto.PrivateKey) (public crypto.PublicKey) {
 	var pri, pub [32]byte
 	if ok := checkType(&pri, private); !ok {
 		panic("ecdh: unexpected type of private key")
@@ -56,14 +63,14 @@ func (c ecdh25519) PublicKey(private crypto.PrivateKey) (public crypto.PublicKey
 	return
 }
 
-func (c ecdh25519) Check(peersPublic crypto.PublicKey) (err error) {
+func (ecdh25519) Check(peersPublic crypto.PublicKey) (err error) {
 	if ok := checkType(new([32]byte), peersPublic); !ok {
 		err = errors.New("unexptected type of peers public key")
 	}
 	return
 }
 
-func (c ecdh25519) ComputeSecret(private crypto.PrivateKey, peersPublic crypto.PublicKey) (secret []byte) {
+func (ecdh25519) ComputeSecret(private crypto.PrivateKey, peersPublic crypto.PublicKey) (secret []byte) {
 	var sec, pri, pub [32]byte
 	if ok := checkType(&pri, private); !ok {
 		panic("ecdh: unexpected type of private key")
