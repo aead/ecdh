@@ -1,4 +1,5 @@
 [![Godoc Reference](https://godoc.org/github.com/aead/ecdh?status.svg)](https://godoc.org/github.com/aead/ecdh)
+[![Build Status](https://travis-ci.org/aead/ecdh.svg?branch=master)](https://travis-ci.org/aead/ecdh)
 
 ## The ECDH key exchange
 

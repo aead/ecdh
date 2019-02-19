@@ -1,0 +1,13 @@
+language: go
+
+go:
+- 1.11.x
+- master
+
+branches:
+  only:
+  - master
+
+script:
+- diff -au <(gofmt -d .) <(printf "")
+- go test -v ./...
