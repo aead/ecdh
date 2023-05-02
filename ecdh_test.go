@@ -40,6 +40,10 @@ func ExampleGeneric() {
 	if !bytes.Equal(secretAlice, secretBob) {
 		fmt.Printf("key exchange failed - secret X coordinates not equal\n")
 	}
+
+	if len(secretAlice) != p256.Params().BitSize/8 {
+		fmt.Printf("computed shared secret is not of the correct size\n")
+	}
 	// Output:
 }
 

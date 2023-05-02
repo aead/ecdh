@@ -92,7 +92,8 @@ func (g genericCurve) ComputeSecret(private crypto.PrivateKey, peersPublic crypt
 
 	sX, _ := g.curve.ScalarMult(pubKey.X, pubKey.Y, priKey)
 
-	secret = sX.Bytes()
+	secret = make([]byte, (g.Params().BitSize+7)/8)
+	sX.FillBytes(secret)
 	return
 }
 
